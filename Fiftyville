@@ -1,0 +1,79 @@
+https://cs50.harvard.edu/extension/2020/fall/psets/7/fiftyville/#:~:text=Write%20SQL%20queries%20to%20solve%20a%20mystery.
+
+-- Keep a log of any SQL queries you execute as you solve the mystery.
+
+-- Write SQL queries to solve a mystery.
+-- The CS50 Duck has been stolen! The town of Fiftyville has called upon you to solve the mystery of the stolen duck. Authorities believe that the thief stole the duck and then, shortly afterwards, took a flight out of town with the help of an accomplice. Your goal is to identify:
+-- Who the thief is,
+-- What city the thief escaped to, and
+-- Who the thief’s accomplice is who helped them escape
+-- All you know is that the theft took place on July 28, 2020 and that it took place on Chamberlin Street.
+
+-- TABLES
+-- TABLE crime_scene_reports(id INTEGER, year INTEGER, month INTEGER, day INTEGER, street TEXT, description TEXT, PRIMARY KEY(id);
+-- TABLE interviews (id INTEGER, name TEXT, year INTEGER, month INTEGER, day INTEGER, transcript TEXT, PRIMARY KEY(id);
+-- TABLE courthouse_security_logs (id INTEGER, year INTEGER, month INTEGER, day INTEGER, hour INTEGER, minute INTEGER, activity TEXT, license_plate TEXT, PRIMARY KEY(id));
+-- TABLE atm_transactions (id INTEGER, account_number INTEGER, year INTEGER, month INTEGER, day INTEGER, atm_location TEXT, transaction_type TEXT, amount INTEGER,PRIMARY KEY(id));
+-- TABLE bank_accounts (account_number INTEGER, person_id INTEGER, creation_year INTEGER, FOREIGN KEY(person_id) REFERENCES people(id));
+-- TABLE airports (id INTEGER, abbreviation TEXT, full_name TEXT, city TEXT, PRIMARY KEY(id));
+-- TABLE flights (id INTEGER, origin_airport_id INTEGER, destination_airport_id INTEGER, year INTEGER, month INTEGER, day INTEGER, hour INTEGER, minute INTEGER, PRIMARY KEY(id), FOREIGN KEY(origin_airport_id) REFERENCES airports(id), FOREIGN KEY(destination_airport_id) REFERENCES airports(id));
+-- TABLE passengers (flight_id INTEGER, passport_number INTEGER, seat TEXT, FOREIGN KEY(flight_id) REFERENCES flights(id));
+-- TABLE phone_calls (id INTEGER, caller TEXT, receiver TEXT, year INTEGER, month INTEGER, day INTEGER,duration INTEGER, PRIMARY KEY(id));
+-- TABLE people (id INTEGER, name TEXT, phone_number TEXT, passport_number INTEGER, license_plate TEXT, PRIMARY KEY(id);
+
+-- Step 1) Isolate the date. To do so, you should start with the SQL query: SELECT * FROM crime_scene_reports; so you can see what the data would look like
+SELECT * FROM crime_scene_reports;
+-- STEP 2) The date of the crime was July 28, 2020 and on Chamberlin Street so you should isolate those two dates. 
+SELECT * FROM crime_scene_reports
+WHERE year = '2020'
+AND month = '07'
+AND day = '28'
+AND street = 'Chamberlin Street';
+-- Step 3) After running the query, which states the following:  Theft of the CS50 duck took place at 10:15am at the Chamberlin Street courthouse. Interviews were conducted today with three witnesses who were present at the time — each of their interview transcripts mentions the courthouse.
+            -- From this, we can gather there were 3 witnesses that were present to the crime the main component could be found in their interview transcripts which mentions the courthouse
+            -- So with this, we can now do a basic search for interviews so that we can see the format
+SELECT * FROM interviews
+WHERE year = '2020'
+AND month = '07'
+AND day = '28';
+        -- The main three witnesses are as follows: Ruth, Eugene, and Raymond
+        -- Summary for Ruth: Within 10 minutes of the theft, he got into a car in the courthouse parking lot. Can find more information in the security footage from the courthouse parking lot
+        -- Summary for Eugene: It was someone that Eugene recognised earlier in the morning. He was walking to the ATM on Fifer Street and saw the thief withdrawing some funds
+        -- Summary for Raymond: As the thief was leaving the courthouse, they called someone for less than a minute. Was planning on taking the earliest flight out of fiftyvillege tomorrow. Requested that the person on the phone pay for the ticket instead
+
+-- Step 4: We should chase down each of the leads starting with Eugene. I started with Eugene because he was the first to see the suspect
+SELECT * FROM atm_transactions 
+WHERE year = '2020'
+AND month = '07'
+AND day = '28'
+AND atm_location = 'Fifer Street'
+AND transaction_type = 'withdraw';
+    -- The following bank accounts appeared
+        -- 28500762 -- Amount Withdrawn was 48
+        -- 28296815 -- Amount Withdrawn was 20
+        -- 76054385 -- Amount Withdrawn was 60
+        -- 49610011 -- Amount Withdrawn was 50
+        -- 16153065 -- Amount Withdrawn was 80
+        -- 25506511 -- Amount Withdrawn was 20
+        -- 81061156 -- Amount Withdrawn was 30
+        -- 26013199 -- Amount Withdrawn was 35 
+-- Step 5: No one withdrew a large amount nor in multiple denominations from the same account so we will have to check each bank account manually
+SELECT * FROM bank_accounts 
+WHERE account_number = '28500762' 
+OR account_number = '28296815'
+OR account_number = '76054385'
+OR account_number = '49610011'
+OR account_number = '16153065'
+OR account_number = '25506511'
+OR account_number = '81061156'
+OR account_number = '26013199';
+    -- Account information: Account ID | person ID | Creation Year
+        -- 49610011 | 686048 | 2010
+        -- 26013199 | 514354 | 2012
+        -- 16153065 | 458378 | 2012
+        -- 28296815 | 395717 | 2014
+        -- 25506511 | 396669 | 2014
+        -- 28500762 | 467400 | 2014
+        -- 76054385 | 449774 | 2015
+        -- 81061156 | 438727 | 2018
+    -- From the looks of it, there is nothing else we can glean from this info -- for now
