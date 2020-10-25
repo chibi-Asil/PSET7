@@ -26,7 +26,7 @@ def import_csv():
     
     # If they input in the correct csv file, it should open
     # We included "w" instead of "r" because we want to change the middle_inital if it is empty
-    with open(argv[1], "w") as csv_file:
+    with open(argv[1], "r") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter = ",")
     # According to the Lecture Notes, we will need to iterate over the rows so that when there is no middle name, we will need to put it down as a NULL character
         for row in csv_reader:
