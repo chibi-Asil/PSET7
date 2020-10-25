@@ -1,4 +1,4 @@
-# TODO
+## TODO
 # In import.py, write a program that imports data from a CSV spreadsheet.
 # Implement a program that identifies a person based on their DNA, per the below.
 import cs50 
@@ -34,21 +34,21 @@ def import_csv():
             name = row["name"]
             delination_name = []
         # From the looks of it, we will need to split the names based on the first 3 - based on space and then populate the middle if there is no value
-        for splitting_names in row["name"].split(""):
+        for splitting_names in row["name"].split(" "):
             delination_name.append(splitting_names)
         
         # After this, we will need to input it into the database
         # The code should come from Lecture 7
-        if (len(delination_name) == 2):
+        if len(delination_name) == 2:
             first_name = delination_name[0]
-            surname = delination_name[2]
-            db.execute("INSERT INTO students (first, middle, last) VALUES(?, ?, ?)", first_name, NONE, surname, row["house"], row["birth"])
+            surname = delination_name[1]
+            db.execute("INSERT INTO students (first, middle, last, house, birth) VALUES(?, ?, ?, ?, ?)", first_name, None, surname, row["house"], row["birth"])
             
-        elif (len(delination_name) == 3):
+        elif len(delination_name) == 3:
             first_name = delination_name[0]
             middle_name = delination_name[1]
             surname = delination_name[2]
-            db.execute("INSERT INTO students (first, middle, last, house) VALUES(?, ?, ?, ?)", first_name, middle_name, surname, row["house"], row["birth"])
+            db.execute("INSERT INTO students (first, middle, last, house, birth) VALUES(?, ?, ?, ?, ?)", first_name, middle_name, surname, row["house"], row["birth"])
 
 
 if __name__ == "__main__":
